@@ -4,6 +4,13 @@ def add_gems
   gem("strong_migrations", "~> 1.6")
   gem("dotenv-rails", "~> 2.8")
   gem("vite_rails", "~> 3.0")
+  gem("aasm", "~> 5.5")
+  gem("simple_form", "~> 5.2")
+  gem("discard", "~> 1.3")
+  gem("local_time", "~> 2.1")
+  gem("sidekiq", "~> 7.1")
+  gem("pagy", "~> 6.0")
+  gem("draper", "~> 4.0")
 
   gem_group(:development, :test) do
     gem("pry", "~> 0.14.2")
@@ -70,6 +77,40 @@ def setup_hotwired
   run("yarn add @hotwired/stimulus @hotwired/turbo-rails")
 end
 
+def setup_simple_form
+  generate("simple_form:install")
+  copy_file("template/config/initializers/simple_form.rb", "config/initializers/simple_form.rb", force: true)
+end
+
+def setup_local_time
+  run("yarn add local-time")
+end
+
+def setup_sidekiq
+  copy_file("template/config/sidekiq.yml", "config/sidekiq.yml")
+  initializer("sidekiq.rb", <<~CODE
+    # frozen_string_literal: true
+
+    Sidekiq.configure_server do |config|
+      config.redis = { url: ENV["REDIS_URL"], network_timeout: 5, pool_timeout: 5 }
+    end
+
+    Sidekiq.configure_client do |config|
+      config.redis = { url: ENV["REDIS_URL"], network_timeout: 5, pool_timeout: 5 }
+    end
+  CODE
+  )
+  environment(%(config.active_job.queue_adapter = :sidekiq))
+end
+
+def setup_pagy
+  copy_file("template/config/initializers/pagy.rb", "config/initializers/pagy.rb")
+end
+
+def setup_draper
+  generate("draper:install")
+end
+
 def setup_dev
   copy_file("template/bin/dev", "bin/dev")
   copy_file("template/Procfile.dev", "Procfile.dev", force: true)
@@ -78,6 +119,12 @@ def setup_dev
   copy_file("template/.env.local", ".env.local", force: true)
   create_file(".env.test.local")
   copy_file("template/config/cable.yml", "config/cable.yml", force: true)
+  environment do
+    %(config.app_generators do |g|
+  g.helper(false)
+  g.decorator(false)
+end)
+  end
 end
 
 def create_initial_page
@@ -106,6 +153,11 @@ after_bundle do
   setup_rubocop
   setup_strong_migrations
   setup_vite
+  setup_simple_form
+  setup_local_time
+  setup_sidekiq
+  setup_pagy
+  setup_draper
   create_initial_page
   setup_dev
 
