@@ -249,8 +249,6 @@ after_bundle do
   create_initial_page
   setup_dev
 
-  # rails_command "db:migrate"
-
   # Git
   git :init unless preexisting_git_repo?
   git add: "."
