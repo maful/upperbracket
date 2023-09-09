@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./.github/upperbracket.png" width="1280" title="Social Card Ruby Phosphor Icons">
+</p>
+
 # UpperBracket
 
 Convenient way to generate full-stack Ruby on Rails application
