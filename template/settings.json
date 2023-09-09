@@ -1,0 +1,28 @@
+{
+  "editor.formatOnSave": false,
+  "[css]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "[javascript]": {
+    "editor.maxTokenizationLineLength": 2500,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "[typescript]": {
+    "editor.maxTokenizationLineLength": 2500,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "tailwindCSS.experimental.classRegex": [
+    "\\bclass:\\s*'([^']*)'",
+    "\\bclass:\\s*\"([^\"]*)\"",
+    "\\bform_class:\\s*'([^']*)'",
+    "\\bform_class:\\s*\"([^\"]*)\""
+  ],
+  "rubyLsp.rubyVersionManager": "asdf",
+  "rubyLsp.formatter": "rubocop",
+  "[ruby]": {
+    "editor.formatOnSave": true
+  }
+}

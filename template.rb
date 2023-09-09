@@ -11,6 +11,9 @@ def add_gems
   gem("sidekiq", "~> 7.1")
   gem("pagy", "~> 6.0")
   gem("draper", "~> 4.0")
+  gem("inline_svg", "~> 1.9")
+  gem("rodauth-rails", "~> 1.11")
+  gem("argon2", "~> 2.3")
 
   gem_group(:development, :test) do
     gem("pry", "~> 0.14.2")
@@ -111,6 +114,49 @@ def setup_draper
   generate("draper:install")
 end
 
+def setup_inline_svg
+  copy_file("template/lib/inline_svg/vite_asset_finder.rb", "lib/inline_svg/vite_asset_finder.rb")
+  initializer("inline_svg.rb", <<-CODE
+  # frozen_string_literal: true
+
+  require Rails.root.join("lib/inline_svg/vite_asset_finder")
+
+  InlineSvg.configure do |config|
+    config.asset_finder = InlineSvg::ViteAssetFinder
+  end
+  CODE
+  )
+end
+
+def setup_tailwindcss
+  run("yarn add -D tailwindcss postcss autoprefixer postcss-nested @tailwindcss/forms")
+  copy_file("template/tailwind.config.js", "tailwind.config.js")
+  copy_file("template/postcss.config.js", "postcss.config.js")
+
+  content = <<~CODE
+    @import url("https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+
+    @import "tailwindcss/base";
+    @import "tailwindcss/components";
+    @import "tailwindcss/utilities";
+  CODE
+  append_to_file("app/javascript/entrypoints/application.css", content, verbose: false)
+end
+
+def setup_prettier
+  run("yarn add -D prettier prettier-plugin-tailwindcss")
+  copy_file("template/.prettierrc.json", ".prettierrc.json")
+end
+
+def setup_rodauth
+  environment('config.action_mailer.default_url_options = { host: "localhost", port: 3000 }', env: "development")
+  generate("rodauth:install", "--argon2")
+  generate("rodauth:views", "--css=tailwind")
+  insert_into_file("app/misc/rodauth_main.rb", after: /# argon2_secret .*$\n/, force: true) do
+    %(    argon2_secret Rails.application.credentials.argon2_secret\n)
+  end
+end
+
 def setup_dev
   copy_file("template/bin/dev", "bin/dev")
   copy_file("template/Procfile.dev", "Procfile.dev", force: true)
@@ -125,6 +171,7 @@ def setup_dev
   g.decorator(false)
 end)
   end
+  copy_file("template/settings.json", ".vscode/settings.json")
 end
 
 def create_initial_page
@@ -158,15 +205,25 @@ after_bundle do
   setup_sidekiq
   setup_pagy
   setup_draper
+  setup_inline_svg
+  setup_tailwindcss
+  setup_prettier
+  setup_rodauth
   create_initial_page
   setup_dev
+
+  rails_command "db:migrate"
 
   # Git
   git :init unless preexisting_git_repo?
   git add: "."
   git commit: "-a -m 'Initial commit'"
-end
 
-say
-say "Upperbracket template successfully configured!", :green
-say
+  say
+  say "Upperbracket template successfully configured!", :green
+  say
+  say "To complete the installation, add argon2_secret to the credentials."
+  say
+  say "If you love Upperbracket, please give us star on GitHub"
+  say "https://github.com/maful/upperbracket"
+end
