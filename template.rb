@@ -1,5 +1,44 @@
 # frozen_string_literal: true
 
+require "fileutils"
+require "shellwords"
+
+RAILS_REQUIREMENT = "~> 7.0.0"
+
+# Copied from https://github.com/mattbrictson/rails-template
+# Add this template directory to source_paths so that Thor actions like
+# copy_file and template resolve against our source files. If this file was
+# invoked remotely via HTTP, that means the files are not present locally.
+# In that case, use `git clone` to download them to a local temporary dir.
+def add_template_repository_to_source_path
+  if __FILE__ =~ %r{\Ahttps?://}
+    require "tmpdir"
+    source_paths.unshift(tempdir = Dir.mktmpdir("upperbracket-template-"))
+    at_exit { FileUtils.remove_entry(tempdir) }
+    git(clone: [
+      "--quiet",
+      "https://github.com/maful/upperbracket.git",
+      tempdir,
+    ].map(&:shellescape).join(" "))
+
+    if (branch = __FILE__[%r{upperbracket-template/(.+)/template.rb}, 1])
+      Dir.chdir(tempdir) { git(checkout: branch) }
+    end
+  else
+    source_paths.unshift(File.dirname(__FILE__))
+  end
+end
+
+def assert_minimum_rails_version
+  requirement = Gem::Requirement.new(RAILS_REQUIREMENT)
+  rails_version = Gem::Version.new(Rails::VERSION::STRING)
+  return if requirement.satisfied_by?(rails_version)
+
+  prompt = "This template requires Rails #{RAILS_REQUIREMENT}. "\
+    "You are using #{rails_version}. Continue anyway?"
+  exit(1) if no?(prompt)
+end
+
 def add_gems
   gem("strong_migrations", "~> 1.6")
   gem("dotenv-rails", "~> 2.8")
@@ -184,11 +223,9 @@ def preexisting_git_repo?
   @preexisting_git_repo == true
 end
 
-def source_paths
-  [__dir__]
-end
-
 # Setup
+assert_minimum_rails_version
+add_template_repository_to_source_path
 add_gems
 
 after_bundle do
@@ -212,7 +249,7 @@ after_bundle do
   create_initial_page
   setup_dev
 
-  rails_command "db:migrate"
+  # rails_command "db:migrate"
 
   # Git
   git :init unless preexisting_git_repo?
@@ -220,10 +257,10 @@ after_bundle do
   git commit: "-a -m 'Initial commit'"
 
   say
-  say "Upperbracket template successfully configured!", :green
+  say "UpperBracket template successfully configured!", :green
   say
   say "To complete the installation, add argon2_secret to the credentials."
   say
-  say "If you love Upperbracket, please give us star on GitHub"
+  say "If you love UpperBracket, please give us star on GitHub"
   say "https://github.com/maful/upperbracket"
 end
