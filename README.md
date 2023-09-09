@@ -14,10 +14,26 @@ Convenient way to generate full-stack Ruby on Rails application
 - [sidekiq](https://github.com/sidekiq/sidekiq)
 - [pagy](https://github.com/ddnexus/pagy)
 - [draper](https://github.com/drapergem/draper)
+- [inline_svg](https://github.com/jamesmartin/inline_svg)
+- [rodauth-rails](https://github.com/janko/rodauth-rails)
+- [prettier](https://prettier.io)
+- [tailwindcss](https://tailwindcss.com)
 - [pry](https://github.com/pry/pry)
 - [rubocop](https://github.com/rubocop/rubocop)
 - [rubocop-rails](https://github.com/rubocop/rubocop-rails)
-- [rubocop-shopify](https://ruby-style-guide.shopify.dev/)
+- [rubocop-shopify](https://ruby-style-guide.shopify.dev)
+
+## Usage
+
+To generate a Rails application using this template, pass the `-m` option to `rails new`, like this:
+
+```
+rails new blog \
+  -d postgresql \
+  -m https://raw.githubusercontent.com/maful/upperbracket/main/template.rb
+```
+
+**The only database supported by this template is postgresql.**
 
 ## Contributing
 
