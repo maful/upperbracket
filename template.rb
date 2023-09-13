@@ -190,7 +190,6 @@ end
 def setup_rodauth
   environment('config.action_mailer.default_url_options = { host: "localhost", port: 3000 }', env: "development")
   generate("rodauth:install", "--argon2")
-  generate("rodauth:views", "--css=tailwind")
   insert_into_file("app/misc/rodauth_main.rb", after: /# argon2_secret .*$\n/, force: true) do
     %(    argon2_secret Rails.application.credentials.argon2_secret\n)
   end
