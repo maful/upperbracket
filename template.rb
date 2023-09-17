@@ -47,7 +47,7 @@ def add_gems
   gem("simple_form", "~> 5.2")
   gem("discard", "~> 1.3")
   gem("local_time", "~> 2.1")
-  gem("sidekiq", "~> 7.1")
+  gem("sidekiq", "~> 7.1") if @install_sidekiq
   gem("pagy", "~> 6.0")
   gem("draper", "~> 4.0")
   gem("inline_svg", "~> 1.9")
@@ -198,6 +198,9 @@ end
 def setup_dev
   copy_file("template/bin/dev", "bin/dev")
   copy_file("template/Procfile.dev", "Procfile.dev", force: true)
+  if @install_sidekiq
+    append_to_file("Procfile.dev", "worker: bundle exec sidekiq -C config/sidekiq.yml\n")
+  end
   chmod("bin/dev", "+x")
   rails_command("turbo:install:redis")
   copy_file("template/.env.local", ".env.local", force: true)
@@ -224,6 +227,11 @@ end
 
 # Setup
 assert_minimum_rails_version
+
+say
+@install_sidekiq = yes?("Install and Configure Sidekiq?")
+say
+
 add_template_repository_to_source_path
 add_gems
 
@@ -238,7 +246,7 @@ after_bundle do
   setup_vite
   setup_simple_form
   setup_local_time
-  setup_sidekiq
+  setup_sidekiq if @install_sidekiq
   setup_pagy
   setup_draper
   setup_inline_svg
