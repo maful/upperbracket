@@ -53,6 +53,7 @@ def add_gems
   gem("inline_svg", "~> 1.9")
   gem("rodauth-rails", "~> 1.11")
   gem("argon2", "~> 2.3")
+  gem("phosphor_icons", "~> 0.2") if @install_phosphor_icons
 
   gem_group(:development, :test) do
     gem("pry", "~> 0.14.2")
@@ -230,6 +231,7 @@ assert_minimum_rails_version
 
 say
 @install_sidekiq = yes?("Install and Configure Sidekiq?")
+@install_phosphor_icons = yes?("Install Phosphor Icons?")
 say
 
 add_template_repository_to_source_path
