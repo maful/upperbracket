@@ -48,6 +48,7 @@ def add_gems
   gem("discard", "~> 1.3")
   gem("local_time", "~> 2.1")
   gem("sidekiq", "~> 7.1") if @install_sidekiq
+  gem("sidekiq-cron", "~> 1.10") if @install_sidekiq && @install_sidekiq_cron
   gem("pagy", "~> 6.0")
   gem("draper", "~> 4.0")
   gem("inline_svg", "~> 1.9")
@@ -144,6 +145,7 @@ def setup_sidekiq
   CODE
   )
   environment(%(config.active_job.queue_adapter = :sidekiq))
+  create_file("config/schedule.yml") if @install_sidekiq_cron
 end
 
 def setup_pagy
@@ -231,6 +233,9 @@ assert_minimum_rails_version
 
 say
 @install_sidekiq = yes?("Install and Configure Sidekiq?")
+if @install_sidekiq
+  @install_sidekiq_cron = yes?("Do you need Sidekiq Cron?")
+end
 @install_phosphor_icons = yes?("Install Phosphor Icons?")
 say
 
