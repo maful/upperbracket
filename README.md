@@ -22,6 +22,8 @@ Convenient way to generate full-stack Ruby on Rails application
 - [rodauth-rails](https://github.com/janko/rodauth-rails)
 - [prettier](https://prettier.io)
 - [tailwindcss](https://tailwindcss.com)
+- [phosphor-icons](https://github.com/maful/ruby-phosphor-icons)
+- [sidekiq-cron](https://github.com/sidekiq-cron/sidekiq-cron)
 - [pry](https://github.com/pry/pry)
 - [rubocop](https://github.com/rubocop/rubocop)
 - [rubocop-rails](https://github.com/rubocop/rubocop-rails)
