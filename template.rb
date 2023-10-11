@@ -55,6 +55,7 @@ def add_gems
   gem("rodauth-rails", "~> 1.11")
   gem("argon2", "~> 2.3")
   gem("phosphor_icons", "~> 0.2") if @install_phosphor_icons
+  gem("action_policy", "~> 0.6") if @install_action_policy
 
   gem_group(:development, :test) do
     gem("pry", "~> 0.14.2")
@@ -198,6 +199,10 @@ def setup_rodauth
   end
 end
 
+def setup_action_policy
+  generate("action_policy:install")
+end
+
 def setup_dev
   copy_file("template/bin/dev", "bin/dev")
   copy_file("template/Procfile.dev", "Procfile.dev", force: true)
@@ -236,6 +241,7 @@ say
 if @install_sidekiq
   @install_sidekiq_cron = yes?("Do you need Sidekiq Cron?")
 end
+@install_action_policy = yes?("Install Action Policy?")
 @install_phosphor_icons = yes?("Install Phosphor Icons?")
 say
 
@@ -260,6 +266,7 @@ after_bundle do
   setup_tailwindcss
   setup_prettier
   setup_rodauth
+  setup_action_policy if @install_action_policy
   create_initial_page
   setup_dev
 
