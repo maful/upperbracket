@@ -56,6 +56,7 @@ def add_gems
   gem("argon2", "~> 2.3")
   gem("phosphor_icons", "~> 0.2") if @install_phosphor_icons
   gem("action_policy", "~> 0.6") if @install_action_policy
+  gem("service_actor", "~> 3.7", require: "service_actor/base") if @install_service_actor
 
   gem_group(:development, :test) do
     gem("pry", "~> 0.14.2")
@@ -203,6 +204,10 @@ def setup_action_policy
   generate("action_policy:install")
 end
 
+def setup_service_actor
+  directory("template/app/actors", "app/actors")
+end
+
 def setup_dev
   copy_file("template/bin/dev", "bin/dev")
   copy_file("template/Procfile.dev", "Procfile.dev", force: true)
@@ -243,6 +248,7 @@ if @install_sidekiq
 end
 @install_action_policy = yes?("Install Action Policy?")
 @install_phosphor_icons = yes?("Install Phosphor Icons?")
+@install_service_actor = yes?("Install Service Actor?")
 say
 
 add_template_repository_to_source_path
@@ -267,6 +273,7 @@ after_bundle do
   setup_prettier
   setup_rodauth
   setup_action_policy if @install_action_policy
+  setup_service_actor if @install_service_actor
   create_initial_page
   setup_dev
 
